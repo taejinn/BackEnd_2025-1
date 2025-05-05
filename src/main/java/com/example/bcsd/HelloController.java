@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class HelloController {
 
     @GetMapping("/introduce")
-    public String hello(@RequestParam String name, Model model) {
+    public String hello(@RequestParam(defaultValue = "박태진") String name, Model model) {
         model.addAttribute("name", name != "" ? name : "박태진");
         return "hello";
     }
