@@ -1,62 +1,108 @@
 package com.example.bcsd;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Post {
-    private Number id;
-    private String description;
-    private static List<Map<String, Object>> posts = new ArrayList<>();
-
     @JsonIgnore
-    public Number getId() {
-        return id;
-    }
-
-    public void setId(Number id) {
-        this.id = id;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
+    private Integer id;
+    private String content;
+    private String title;
+    private String author;
+    private LocalDateTime date;
+    
     @JsonIgnore
-    public List<Map<String, Object>> getPosts() {
-        return posts;
+    private static List<Post> allPosts = new ArrayList<>();
+    
+    public Post() {
+    }
+    
+    public Post(String title, String author, String content) {
+        this.title = title;
+        this.author = author;
+        this.content = content;
+        this.date = LocalDateTime.now();
     }
 
-    public void setPosts() {
-        Map<String, Object> post = new HashMap<>();
-        int newId = posts.size();
-        post.put("id", newId);
-        post.put("description", this.description);
-        
-        this.id = newId;
-        posts.add(post);
+    public void save() {
+        this.id = allPosts.size();
+        if (this.date == null) {
+            this.date = LocalDateTime.now();
+        }
+        allPosts.add(this);
     }
-
-    public void deletePosts(Integer id) {
-        if (id >= 0 && id < posts.size()) {
-            posts.remove(id.intValue());
-
-            for (int i = id; i < posts.size(); i++) {
-                posts.get(i).put("id", i);
+    
+    @JsonIgnore
+    public static Post findById(Integer id) {
+        if (id >= 0 && id < allPosts.size()) {
+            return allPosts.get(id);
+        }
+        return null;
+    }
+    
+    @JsonIgnore
+    public static List<Post> findAll() {
+        return allPosts;
+    }
+    
+    public static void deleteById(Integer id) {
+        if (id >= 0 && id < allPosts.size()) {
+            allPosts.remove(id.intValue());
+            
+            for (int i = id; i < allPosts.size(); i++) {
+                allPosts.get(i).id = i;
             }
         }
     }
+    
+    public void update(String title, String author, String content) {
+        this.title = title;
+        this.author = author;
+        this.content = content;
+        this.date = LocalDateTime.now();
+    }
 
-    public String getDescription(Integer id) {
-        if (id >= 0 && id < posts.size()) {
-            return (String) posts.get(id).get("description");
-        }
-        return null;
+    @JsonIgnore
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public LocalDateTime getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDateTime date) {
+        this.date = date;
     }
 }
