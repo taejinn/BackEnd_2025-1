@@ -8,13 +8,12 @@ import org.springframework.stereotype.Service;
 import com.example.bcsd.model.Board;
 import com.example.bcsd.repository.BoardRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class BoardService {
     private final BoardRepository boardRepository;
-
-    public BoardService(BoardRepository boardRepository) {
-        this.boardRepository = boardRepository;
-    }
 
     public List<Board> findAllBoards() {
         return boardRepository.findAll();
