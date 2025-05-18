@@ -46,11 +46,19 @@ public class ArticleController {
 
     @GetMapping("/articles")
     @ResponseBody
-    public ResponseEntity<List<Article>> getArticles() {
-        List<Article> articles = articleService.findAllArticles();
+    public ResponseEntity<List<Article>> getArticles(HttpServletRequest request) {
+        String boardId = request.getParameter("boardId");
+        List<Article> articles;
+        if (boardId != null && !boardId.isEmpty()) {
+            articles = articleService.findArticlesByBoardId(Long.valueOf(boardId));
+        } else {
+            articles = articleService.findAllArticles();
+        }
+
         if (articles.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+
         return ResponseEntity.ok(articles);
     }
 
