@@ -22,4 +22,4 @@ public class PostRepository {
     public void deleteById(Integer id) {
         Post.deleteById(id);
     }
-} 
+}
