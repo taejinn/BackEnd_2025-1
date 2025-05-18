@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.example.bcsd.model.Member;
+
 @Controller
 public class HelloController {
 
@@ -17,10 +19,11 @@ public class HelloController {
 
     @GetMapping("/json")
     @ResponseBody
-    public User jsonPage() {
-        User user = new User();
-        user.setName("배진호");
-        user.setAge(20); // ^_^
-        return user;
+    public Member jsonPage() {
+        Member member = new Member();
+        member.setName("배진호");
+        member.setEmail("test@example.com");
+        member.setId(1L);
+        return member;
     }
 }

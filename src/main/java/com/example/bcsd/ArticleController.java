@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.example.bcsd.model.Article;
+
 @Controller
 public class ArticleController {
     
@@ -27,46 +29,46 @@ public class ArticleController {
     
     @GetMapping("/posts")
     public String posts(Model model) {
-        List<Post> posts = postService.getAllPosts();
-        model.addAttribute("posts", posts);
+        List<Article> articles = postService.getAllPosts();
+        model.addAttribute("posts", articles);
         return "posts";
     }
 
     @GetMapping("/articles")
     @ResponseBody
-    public ResponseEntity<List<Post>> getArticles() {
-        List<Post> posts = postService.getAllPosts();
-        if (posts.isEmpty()) {
+    public ResponseEntity<List<Article>> getArticles() {
+        List<Article> articles = postService.getAllPosts();
+        if (articles.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        return ResponseEntity.ok(posts);
+        return ResponseEntity.ok(articles);
     }
 
     @GetMapping("/article/{id}")
     @ResponseBody
-    public ResponseEntity<Post> getArticle(@PathVariable("id") Integer id) {
-        Post post = postService.getPostById(id);
-        if (post == null) {
+    public ResponseEntity<Article> getArticle(@PathVariable("id") Integer id) {
+        Article article = postService.getPostById(id);
+        if (article == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        return ResponseEntity.ok(post);
+        return ResponseEntity.ok(article);
     }
 
     @PostMapping("/article")
     @ResponseBody
-    public ResponseEntity<Post> createArticle(@RequestBody Post post) {
-        postService.createPost(post);
-        return ResponseEntity.status(HttpStatus.CREATED).body(post);
+    public ResponseEntity<Article> createArticle(@RequestBody Article article) {
+        postService.createPost(article);
+        return ResponseEntity.status(HttpStatus.CREATED).body(article);
     }
 
     @PutMapping("/article/{id}")
     @ResponseBody
-    public ResponseEntity<Post> updateArticle(@PathVariable("id") Integer id, @RequestBody Post requestPost) {
-        Post post = postService.updatePost(id, requestPost);
-        if (post == null) {
+    public ResponseEntity<Article> updateArticle(@PathVariable("id") Integer id, @RequestBody Article requestArticle) {
+        Article article = postService.updatePost(id, requestArticle);
+        if (article == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        return ResponseEntity.ok(post);
+        return ResponseEntity.ok(article);
     }
 
     @DeleteMapping("/article/{id}")

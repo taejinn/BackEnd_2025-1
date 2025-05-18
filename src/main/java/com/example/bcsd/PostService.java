@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.bcsd.model.Article;
+
 @Service
 public class PostService {
     
@@ -15,29 +17,31 @@ public class PostService {
         this.postRepository = postRepository;
     }
     
-    public List<Post> getAllPosts() {
+    public List<Article> getAllPosts() {
         return postRepository.findAll();
     }
     
-    public Post getPostById(Integer id) {
+    public Article getPostById(Integer id) {
         return postRepository.findById(id);
     }
     
-    public void createPost(Post post) {
-        postRepository.save(post);
+    public void createPost(Article article) {
+        postRepository.save(article);
     }
     
-    public Post updatePost(Integer id, Post requestPost) {
-        Post post = postRepository.findById(id);
-        if (post != null) {
-            post.update(requestPost.getTitle(), requestPost.getAuthor(), requestPost.getContent());
+    public Article updatePost(Integer id, Article requestArticle) {
+        Article article = postRepository.findById(id);
+        if (article != null) {
+            article.setTitle(requestArticle.getTitle());
+            article.setContent(requestArticle.getContent());
+            article.setMemberId(requestArticle.getMemberId());
         }
-        return post;
+        return article;
     }
     
     public boolean deletePost(Integer id) {
-        Post post = postRepository.findById(id);
-        if (post == null) {
+        Article article = postRepository.findById(id);
+        if (article == null) {
             return false;
         }
         postRepository.deleteById(id);
