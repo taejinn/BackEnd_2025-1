@@ -25,13 +25,13 @@ public class ArticleRepository {
         return Optional.ofNullable(store.get(id));
     }
 
-    public List<Article> findByMemberId(String memberId) {
+    public List<Article> findByMemberId(Long memberId) {
         return store.values().stream()
-                .filter(article -> article.getMemberId().equals(memberId))
+                .filter(article -> false)
                 .collect(Collectors.toList());
     }
 
-    public List<Article> findByBoardId(String boardId) {
+    public List<Article> findByBoardId(Long boardId) {
         return store.values().stream()
                 .filter(article -> article.getBoardId().equals(boardId))
                 .collect(Collectors.toList());

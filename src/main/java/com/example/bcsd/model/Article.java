@@ -4,8 +4,8 @@ import java.time.LocalDateTime;
 
 public class Article {
     private Long id;
-    private String memberId;
-    private String boardId;
+    private Long memberId;
+    private Long boardId;
     private String title;
     private String content;
     private LocalDateTime createdAt;
@@ -14,7 +14,7 @@ public class Article {
     public Article() {
     }
 
-    public Article(Long id, String memberId, String boardId, String title, String content,
+    public Article(Long id, Long memberId, Long boardId, String title, String content,
                   LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.memberId = memberId;
@@ -33,19 +33,19 @@ public class Article {
         this.id = id;
     }
 
-    public String getMemberId() {
+    public Long getMemberId() {
         return memberId;
     }
 
-    public void setMemberId(String memberId) {
+    public void setMemberId(Long memberId) {
         this.memberId = memberId;
     }
 
-    public String getBoardId() {
+    public Long getBoardId() {
         return boardId;
     }
 
-    public void setBoardId(String boardId) {
+    public void setBoardId(Long boardId) {
         this.boardId = boardId;
     }
 

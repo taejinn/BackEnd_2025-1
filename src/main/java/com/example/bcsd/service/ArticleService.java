@@ -29,11 +29,11 @@ public class ArticleService {
         return articleRepository.findById(id).orElse(null);
     }
 
-    public List<Article> findArticlesByMemberId(String memberId) {
+    public List<Article> findArticlesByMemberId(Long memberId) {
         return articleRepository.findByMemberId(memberId);
     }
 
-    public List<Article> findArticlesByBoardId(String boardId) {
+    public List<Article> findArticlesByBoardId(Long boardId) {
         return articleRepository.findByBoardId(boardId);
     }
 
