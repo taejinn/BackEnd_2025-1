@@ -32,7 +32,7 @@ public class ArticleController {
         return "posts";
     }
 
-    @GetMapping("/article")
+    @GetMapping("/articles")
     @ResponseBody
     public ResponseEntity<List<Post>> getArticles() {
         List<Post> posts = postService.getAllPosts();
