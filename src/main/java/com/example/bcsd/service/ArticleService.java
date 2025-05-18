@@ -24,6 +24,10 @@ public class ArticleService {
     public Optional<Article> findArticleById(Long id) {
         return articleRepository.findById(id);
     }
+    
+    public Article getArticleById(Long id) {
+        return articleRepository.findById(id).orElse(null);
+    }
 
     public List<Article> findArticlesByMemberId(String memberId) {
         return articleRepository.findByMemberId(memberId);
@@ -52,8 +56,33 @@ public class ArticleService {
         
         return articleRepository.save(article);
     }
+    
+    public Article updateArticle(Long id, Article updatedArticle) {
+        Optional<Article> articleOptional = articleRepository.findById(id);
+        if (articleOptional.isEmpty()) {
+            return null;
+        }
+        
+        Article existingArticle = articleOptional.get();
+        existingArticle.setTitle(updatedArticle.getTitle());
+        existingArticle.setContent(updatedArticle.getContent());
+        existingArticle.setMemberId(updatedArticle.getMemberId());
+        existingArticle.setBoardId(updatedArticle.getBoardId());
+        existingArticle.setUpdatedAt(LocalDateTime.now());
+        
+        return articleRepository.save(existingArticle);
+    }
 
     public void deleteArticleById(Long id) {
         articleRepository.deleteById(id);
+    }
+    
+    public boolean deleteArticleIfExists(Long id) {
+        if (articleRepository.findById(id).isEmpty()) {
+            return false;
+        }
+        
+        articleRepository.deleteById(id);
+        return true;
     }
 } 

@@ -16,20 +16,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.bcsd.model.Article;
+import com.example.bcsd.service.ArticleService;
 
 @Controller
 public class ArticleController {
     
-    private final PostService postService;
+    private final ArticleService articleService;
     
     @Autowired
-    public ArticleController(PostService postService) {
-        this.postService = postService;
+    public ArticleController(ArticleService articleService) {
+        this.articleService = articleService;
     }
     
     @GetMapping("/posts")
     public String posts(Model model) {
-        List<Article> articles = postService.getAllPosts();
+        List<Article> articles = articleService.findAllArticles();
         model.addAttribute("posts", articles);
         return "posts";
     }
@@ -37,7 +38,7 @@ public class ArticleController {
     @GetMapping("/articles")
     @ResponseBody
     public ResponseEntity<List<Article>> getArticles() {
-        List<Article> articles = postService.getAllPosts();
+        List<Article> articles = articleService.findAllArticles();
         if (articles.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -46,8 +47,8 @@ public class ArticleController {
 
     @GetMapping("/article/{id}")
     @ResponseBody
-    public ResponseEntity<Article> getArticle(@PathVariable("id") Integer id) {
-        Article article = postService.getPostById(id);
+    public ResponseEntity<Article> getArticle(@PathVariable("id") Long id) {
+        Article article = articleService.getArticleById(id);
         if (article == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -57,24 +58,24 @@ public class ArticleController {
     @PostMapping("/article")
     @ResponseBody
     public ResponseEntity<Article> createArticle(@RequestBody Article article) {
-        postService.createPost(article);
-        return ResponseEntity.status(HttpStatus.CREATED).body(article);
+        Article savedArticle = articleService.saveArticle(article);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedArticle);
     }
 
     @PutMapping("/article/{id}")
     @ResponseBody
-    public ResponseEntity<Article> updateArticle(@PathVariable("id") Integer id, @RequestBody Article requestArticle) {
-        Article article = postService.updatePost(id, requestArticle);
-        if (article == null) {
+    public ResponseEntity<Article> updateArticle(@PathVariable("id") Long id, @RequestBody Article requestArticle) {
+        Article updatedArticle = articleService.updateArticle(id, requestArticle);
+        if (updatedArticle == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        return ResponseEntity.ok(article);
+        return ResponseEntity.ok(updatedArticle);
     }
 
     @DeleteMapping("/article/{id}")
     @ResponseBody
-    public ResponseEntity<Void> deleteArticle(@PathVariable("id") Integer id) {
-        boolean deleted = postService.deletePost(id);
+    public ResponseEntity<Void> deleteArticle(@PathVariable("id") Long id) {
+        boolean deleted = articleService.deleteArticleIfExists(id);
         if (!deleted) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
