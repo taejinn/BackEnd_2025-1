@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.example.bcsd.model.Article;
 import com.example.bcsd.service.ArticleService;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @Controller
 public class ArticleController {
     
@@ -29,8 +31,15 @@ public class ArticleController {
     }
     
     @GetMapping("/posts")
-    public String posts(Model model) {
-        List<Article> articles = articleService.findAllArticles();
+    public String posts(Model model, HttpServletRequest request) {
+        String boardId = request.getParameter("boardId");
+        List<Article> articles;
+        if (boardId != null && !boardId.isEmpty()) {
+            articles = articleService.findArticlesByBoardId(Long.valueOf(boardId));
+            model.addAttribute("boardId", boardId);
+        } else {
+            articles = articleService.findAllArticles();
+        }
         model.addAttribute("posts", articles);
         return "posts";
     }
