@@ -1,4 +1,4 @@
-package com.example.bcsd;
+package com.example.bcsd.controller;
 
 import java.util.List;
 
