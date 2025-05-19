@@ -4,39 +4,42 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.example.bcsd.dao.MemberDao;
 import com.example.bcsd.model.Member;
-import com.example.bcsd.repository.MemberRepository;
 
 @Service
 public class MemberService {
-    private final MemberRepository memberRepository;
+    private final MemberDao memberDao;
 
-    public MemberService(MemberRepository memberRepository) {
-        this.memberRepository = memberRepository;
+    public MemberService(MemberDao memberDao) {
+        this.memberDao = memberDao;
     }
 
     public List<Member> findAllMembers() {
-        return memberRepository.findAll();
+        return memberDao.findAll();
     }
 
     public Optional<Member> findMemberById(Long id) {
-        return memberRepository.findById(id);
+        return memberDao.findById(id);
     }
 
     public Optional<Member> findMemberByEmail(String email) {
-        return memberRepository.findByEmail(email);
+        return memberDao.findByEmail(email);
     }
 
+    @Transactional
     public Member saveMember(Member member) {
-        Optional<Member> existingMember = memberRepository.findByEmail(member.getEmail());
+        Optional<Member> existingMember = memberDao.findByEmail(member.getEmail());
         if (existingMember.isPresent() && !existingMember.get().getId().equals(member.getId())) {
             throw new IllegalStateException("이미 사용 중인 이메일입니다.");
         }
-        return memberRepository.save(member);
+        return memberDao.save(member);
     }
 
+    @Transactional
     public void deleteMemberById(Long id) {
-        memberRepository.deleteById(id);
+        memberDao.deleteById(id);
     }
 } 

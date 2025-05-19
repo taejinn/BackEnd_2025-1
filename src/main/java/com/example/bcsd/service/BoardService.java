@@ -4,38 +4,42 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.example.bcsd.dao.BoardDao;
 import com.example.bcsd.model.Board;
-import com.example.bcsd.repository.BoardRepository;
-
-import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
 public class BoardService {
-    private final BoardRepository boardRepository;
+    private final BoardDao boardDao;
+
+    public BoardService(BoardDao boardDao) {
+        this.boardDao = boardDao;
+    }
 
     public List<Board> findAllBoards() {
-        return boardRepository.findAll();
+        return boardDao.findAll();
     }
 
     public Optional<Board> findBoardById(Long id) {
-        return boardRepository.findById(id);
+        return boardDao.findById(id);
     }
 
     public Optional<Board> findBoardByName(String name) {
-        return boardRepository.findByName(name);
+        return boardDao.findByName(name);
     }
 
+    @Transactional
     public Board saveBoard(Board board) {
-        Optional<Board> existingBoard = boardRepository.findByName(board.getName());
+        Optional<Board> existingBoard = boardDao.findByName(board.getName());
         if (existingBoard.isPresent() && !existingBoard.get().getId().equals(board.getId())) {
             throw new IllegalStateException("이미 사용 중인 게시판 이름입니다.");
         }
-        return boardRepository.save(board);
+        return boardDao.save(board);
     }
 
+    @Transactional
     public void deleteBoardById(Long id) {
-        boardRepository.deleteById(id);
+        boardDao.deleteById(id);
     }
 } 

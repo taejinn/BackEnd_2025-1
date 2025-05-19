@@ -5,38 +5,40 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.example.bcsd.dao.ArticleDao;
 import com.example.bcsd.model.Article;
-import com.example.bcsd.repository.ArticleRepository;
 
 @Service
 public class ArticleService {
-    private final ArticleRepository articleRepository;
+    private final ArticleDao articleDao;
 
-    public ArticleService(ArticleRepository articleRepository) {
-        this.articleRepository = articleRepository;
+    public ArticleService(ArticleDao articleDao) {
+        this.articleDao = articleDao;
     }
 
     public List<Article> findAllArticles() {
-        return articleRepository.findAll();
+        return articleDao.findAll();
     }
 
     public Optional<Article> findArticleById(Long id) {
-        return articleRepository.findById(id);
+        return articleDao.findById(id);
     }
     
     public Article getArticleById(Long id) {
-        return articleRepository.findById(id).orElse(null);
+        return articleDao.findById(id).orElse(null);
     }
 
     public List<Article> findArticlesByMemberId(Long memberId) {
-        return articleRepository.findByMemberId(memberId);
+        return articleDao.findByMemberId(memberId);
     }
 
     public List<Article> findArticlesByBoardId(Long boardId) {
-        return articleRepository.findByBoardId(boardId);
+        return articleDao.findByBoardId(boardId);
     }
 
+    @Transactional
     public Article saveArticle(Article article) {
         LocalDateTime now = LocalDateTime.now();
         
@@ -44,7 +46,7 @@ public class ArticleService {
             article.setCreatedAt(now);
             article.setUpdatedAt(now);
         } else {
-            Optional<Article> existingArticle = articleRepository.findById(article.getId());
+            Optional<Article> existingArticle = articleDao.findById(article.getId());
             if (existingArticle.isPresent()) {
                 article.setCreatedAt(existingArticle.get().getCreatedAt());
                 article.setUpdatedAt(now);
@@ -54,11 +56,12 @@ public class ArticleService {
             }
         }
         
-        return articleRepository.save(article);
+        return articleDao.save(article);
     }
     
+    @Transactional
     public Article updateArticle(Long id, Article updatedArticle) {
-        Optional<Article> articleOptional = articleRepository.findById(id);
+        Optional<Article> articleOptional = articleDao.findById(id);
         if (articleOptional.isEmpty()) {
             return null;
         }
@@ -70,19 +73,21 @@ public class ArticleService {
         existingArticle.setBoardId(updatedArticle.getBoardId());
         existingArticle.setUpdatedAt(LocalDateTime.now());
         
-        return articleRepository.save(existingArticle);
+        return articleDao.save(existingArticle);
     }
 
+    @Transactional
     public void deleteArticleById(Long id) {
-        articleRepository.deleteById(id);
+        articleDao.deleteById(id);
     }
     
+    @Transactional
     public boolean deleteArticleIfExists(Long id) {
-        if (articleRepository.findById(id).isEmpty()) {
+        if (articleDao.findById(id).isEmpty()) {
             return false;
         }
         
-        articleRepository.deleteById(id);
+        articleDao.deleteById(id);
         return true;
     }
 } 
