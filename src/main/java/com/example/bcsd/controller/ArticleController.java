@@ -54,21 +54,13 @@ public class ArticleController {
         } else {
             articles = articleService.findAllArticles();
         }
-
-        if (articles.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-
         return ResponseEntity.ok(articles);
     }
 
     @GetMapping("/article/{id}")
     @ResponseBody
     public ResponseEntity<Article> getArticle(@PathVariable("id") Long id) {
-        Article article = articleService.getArticleById(id);
-        if (article == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        Article article = articleService.findArticleById(id);
         return ResponseEntity.ok(article);
     }
 
@@ -83,19 +75,13 @@ public class ArticleController {
     @ResponseBody
     public ResponseEntity<Article> updateArticle(@PathVariable("id") Long id, @RequestBody Article requestArticle) {
         Article updatedArticle = articleService.updateArticle(id, requestArticle);
-        if (updatedArticle == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
         return ResponseEntity.ok(updatedArticle);
     }
 
     @DeleteMapping("/article/{id}")
     @ResponseBody
     public ResponseEntity<Void> deleteArticle(@PathVariable("id") Long id) {
-        boolean deleted = articleService.deleteArticleIfExists(id);
-        if (!deleted) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        articleService.deleteArticleById(id);
         return ResponseEntity.noContent().build();
     }
 }
