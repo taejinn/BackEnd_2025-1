@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.bcsd.dao.ArticleDao;
 import com.example.bcsd.dao.BoardDao;
+import com.example.bcsd.dto.BoardRequestDto;
 import com.example.bcsd.exception.DuplicateResourceException;
 import com.example.bcsd.exception.InvalidRequestException;
 import com.example.bcsd.exception.ResourceNotFoundException;
@@ -24,51 +25,50 @@ public class BoardService {
         this.articleDao = articleDao;
     }
 
-    public List<Board> findAllBoards() {
+    public List<Board> getAllBoards() {
         return boardDao.findAll();
     }
 
-    public Board findBoardById(Long id) {
+    public Board getBoardById(Long id) {
         return boardDao.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 게시판입니다."));
     }
 
-    public Optional<Board> findBoardByName(String name) {
+    public Optional<Board> getBoardByName(String name) {
         return boardDao.findByName(name);
     }
 
     @Transactional
-    public Board saveBoard(Board board) {
-        validateBoardFields(board);
-        
+    public Board createBoard(BoardRequestDto boardDto) {
+        Board board = new Board();
+        board.setName(boardDto.getName());
+
         Optional<Board> existingBoard = boardDao.findByName(board.getName());
-        if (existingBoard.isPresent() && !existingBoard.get().getId().equals(board.getId())) {
+        if (existingBoard.isPresent() && (board.getId() == null || !existingBoard.get().getId().equals(board.getId()))) {
             throw new DuplicateResourceException("이미 사용 중인 게시판 이름입니다.");
         }
         return boardDao.save(board);
     }
 
     @Transactional
-    public Board updateBoard(Long id, Board updatedBoard) {
-        Board existingBoard = findBoardById(id);
+    public Board updateBoard(Long id, BoardRequestDto boardDto) {
+        Board existingBoardEntity = getBoardById(id);
         
-        if (!existingBoard.getName().equals(updatedBoard.getName())) {
-            Optional<Board> duplicateNameBoard = boardDao.findByName(updatedBoard.getName());
+        if (!existingBoardEntity.getName().equals(boardDto.getName())) {
+            Optional<Board> duplicateNameBoard = boardDao.findByName(boardDto.getName());
             if (duplicateNameBoard.isPresent()) {
                 throw new DuplicateResourceException("이미 사용 중인 게시판 이름입니다.");
             }
         }
         
-        validateBoardFields(updatedBoard);
+        existingBoardEntity.setName(boardDto.getName());
         
-        existingBoard.setName(updatedBoard.getName());
-        
-        return boardDao.save(existingBoard);
+        return boardDao.save(existingBoardEntity);
     }
 
     @Transactional
     public void deleteBoardById(Long id) {
-        Board board = findBoardById(id);
+        Board board = getBoardById(id);
         
         List<Article> boardArticles = articleDao.findByBoardId(id);
         if (!boardArticles.isEmpty()) {
@@ -76,11 +76,5 @@ public class BoardService {
         }
         
         boardDao.deleteById(id);
-    }
-
-    private void validateBoardFields(Board board) {
-        if (board.getName() == null) {
-            throw new InvalidRequestException("게시판 정보의 필수 필드가 누락되었습니다.");
-        }
     }
 } 

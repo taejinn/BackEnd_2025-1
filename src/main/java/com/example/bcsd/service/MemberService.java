@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.bcsd.dao.ArticleDao;
 import com.example.bcsd.dao.MemberDao;
+import com.example.bcsd.dto.MemberRequestDto;
 import com.example.bcsd.exception.DuplicateResourceException;
 import com.example.bcsd.exception.InvalidRequestException;
 import com.example.bcsd.exception.ResourceNotFoundException;
@@ -24,53 +25,54 @@ public class MemberService {
         this.articleDao = articleDao;
     }
 
-    public List<Member> findAllMembers() {
+    public List<Member> getAllMembers() {
         return memberDao.findAll();
     }
 
-    public Member findMemberById(Long id) {
+    public Member getMemberById(Long id) {
         return memberDao.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 사용자입니다."));
     }
 
-    public Optional<Member> findMemberByEmail(String email) {
+    public Optional<Member> getMemberByEmail(String email) {
         return memberDao.findByEmail(email);
     }
 
     @Transactional
-    public Member saveMember(Member member) {
-        validateMemberFields(member);
-        
+    public Member createMember(MemberRequestDto memberDto) {
+        Member member = new Member();
+        member.setName(memberDto.getName());
+        member.setEmail(memberDto.getEmail());
+        member.setPassword(memberDto.getPassword());
+
         Optional<Member> existingMember = memberDao.findByEmail(member.getEmail());
-        if (existingMember.isPresent() && !existingMember.get().getId().equals(member.getId())) {
+        if (existingMember.isPresent() && (member.getId() == null || !existingMember.get().getId().equals(member.getId()))) {
             throw new DuplicateResourceException("이미 사용 중인 이메일입니다.");
         }
         return memberDao.save(member);
     }
 
     @Transactional
-    public Member updateMember(Long id, Member updatedMember) {
-        Member existingMember = findMemberById(id);
+    public Member updateMember(Long id, MemberRequestDto memberDto) {
+        Member existingMemberEntity = getMemberById(id);
         
-        if (!existingMember.getEmail().equals(updatedMember.getEmail())) {
-            Optional<Member> duplicateEmailMember = memberDao.findByEmail(updatedMember.getEmail());
+        if (!existingMemberEntity.getEmail().equals(memberDto.getEmail())) {
+            Optional<Member> duplicateEmailMember = memberDao.findByEmail(memberDto.getEmail());
             if (duplicateEmailMember.isPresent()) {
                 throw new DuplicateResourceException("이미 사용 중인 이메일입니다.");
             }
         }
         
-        validateMemberFields(updatedMember);
+        existingMemberEntity.setName(memberDto.getName());
+        existingMemberEntity.setEmail(memberDto.getEmail());
+        existingMemberEntity.setPassword(memberDto.getPassword());
         
-        existingMember.setName(updatedMember.getName());
-        existingMember.setEmail(updatedMember.getEmail());
-        existingMember.setPassword(updatedMember.getPassword());
-        
-        return memberDao.save(existingMember);
+        return memberDao.save(existingMemberEntity);
     }
 
     @Transactional
     public void deleteMemberById(Long id) {
-        Member member = findMemberById(id);
+        Member member = getMemberById(id);
         
         List<Article> memberArticles = articleDao.findByMemberId(id);
         if (!memberArticles.isEmpty()) {
@@ -78,11 +80,5 @@ public class MemberService {
         }
         
         memberDao.deleteById(id);
-    }
-
-    private void validateMemberFields(Member member) {
-        if (member.getName() == null || member.getEmail() == null || member.getPassword() == null) {
-            throw new InvalidRequestException("사용자 정보의 필수 필드가 누락되었습니다.");
-        }
     }
 } 

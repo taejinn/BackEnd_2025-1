@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.bcsd.model.Board;
 import com.example.bcsd.service.BoardService;
+import com.example.bcsd.dto.BoardRequestDto;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -25,25 +27,25 @@ public class BoardController {
     
     @GetMapping("/boards")
     public ResponseEntity<List<Board>> getAllBoards() {
-        List<Board> boards = boardService.findAllBoards();
+        List<Board> boards = boardService.getAllBoards();
         return ResponseEntity.ok(boards);
     }
     
     @GetMapping("/board/{id}")
     public ResponseEntity<Board> getBoard(@PathVariable Long id) {
-        Board board = boardService.findBoardById(id);
+        Board board = boardService.getBoardById(id);
         return ResponseEntity.ok(board);
     }
     
     @PostMapping("/board")
-    public ResponseEntity<Board> createBoard(@RequestBody Board board) {
-        Board savedBoard = boardService.saveBoard(board);
+    public ResponseEntity<Board> createBoard(@Valid @RequestBody BoardRequestDto boardDto) {
+        Board savedBoard = boardService.createBoard(boardDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedBoard);
     }
     
     @PutMapping("/board/{id}")
-    public ResponseEntity<Board> updateBoard(@PathVariable Long id, @RequestBody Board board) {
-        Board updatedBoard = boardService.updateBoard(id, board);
+    public ResponseEntity<Board> updateBoard(@PathVariable Long id, @Valid @RequestBody BoardRequestDto boardDto) {
+        Board updatedBoard = boardService.updateBoard(id, boardDto);
         return ResponseEntity.ok(updatedBoard);
     }
     

@@ -3,9 +3,12 @@ package com.example.bcsd.exception;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -30,6 +33,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, Object> errors = new HashMap<>();
+        errors.put("timestamp", LocalDateTime.now());
+        errors.put("status", HttpStatus.BAD_REQUEST.value());
+        String errorMessage = ex.getBindingResult()
+                                .getAllErrors()
+                                .stream()
+                                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                                .collect(Collectors.joining(", "));
+        errors.put("error", errorMessage);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
         Map<String, Object> response = createErrorResponse("서버 내부 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -43,4 +60,4 @@ public class GlobalExceptionHandler {
         response.put("error", message);
         return response;
     }
-} 
+}

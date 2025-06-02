@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.bcsd.model.Member;
 import com.example.bcsd.service.MemberService;
+import com.example.bcsd.dto.MemberRequestDto;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -25,25 +27,25 @@ public class MemberController {
     
     @GetMapping("/members")
     public ResponseEntity<List<Member>> getAllMembers() {
-        List<Member> members = memberService.findAllMembers();
+        List<Member> members = memberService.getAllMembers();
         return ResponseEntity.ok(members);
     }
     
     @GetMapping("/member/{id}")
     public ResponseEntity<Member> getMember(@PathVariable Long id) {
-        Member member = memberService.findMemberById(id);
+        Member member = memberService.getMemberById(id);
         return ResponseEntity.ok(member);
     }
     
     @PostMapping("/member")
-    public ResponseEntity<Member> createMember(@RequestBody Member member) {
-        Member savedMember = memberService.saveMember(member);
+    public ResponseEntity<Member> createMember(@Valid @RequestBody MemberRequestDto memberDto) {
+        Member savedMember = memberService.createMember(memberDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedMember);
     }
     
     @PutMapping("/member/{id}")
-    public ResponseEntity<Member> updateMember(@PathVariable Long id, @RequestBody Member member) {
-        Member updatedMember = memberService.updateMember(id, member);
+    public ResponseEntity<Member> updateMember(@PathVariable Long id, @Valid @RequestBody MemberRequestDto memberDto) {
+        Member updatedMember = memberService.updateMember(id, memberDto);
         return ResponseEntity.ok(updatedMember);
     }
     

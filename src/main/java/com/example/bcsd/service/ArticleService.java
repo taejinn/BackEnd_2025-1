@@ -2,7 +2,6 @@ package com.example.bcsd.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.bcsd.dao.ArticleDao;
 import com.example.bcsd.dao.BoardDao;
 import com.example.bcsd.dao.MemberDao;
+import com.example.bcsd.dto.ArticleRequestDto;
 import com.example.bcsd.exception.InvalidRequestException;
 import com.example.bcsd.exception.ResourceNotFoundException;
 import com.example.bcsd.model.Article;
@@ -26,11 +26,11 @@ public class ArticleService {
         this.boardDao = boardDao;
     }
 
-    public List<Article> findAllArticles() {
+    public List<Article> getAllArticles() {
         return articleDao.findAll();
     }
 
-    public Article findArticleById(Long id) {
+    public Article getArticleByIdOrElseThrow(Long id) {
         return articleDao.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 게시물입니다."));
     }
@@ -39,51 +39,44 @@ public class ArticleService {
         return articleDao.findById(id).orElse(null);
     }
 
-    public List<Article> findArticlesByMemberId(Long memberId) {
+    public List<Article> getArticlesByMemberId(Long memberId) {
         return articleDao.findByMemberId(memberId);
     }
 
-    public List<Article> findArticlesByBoardId(Long boardId) {
+    public List<Article> getArticlesByBoardId(Long boardId) {
         return articleDao.findByBoardId(boardId);
     }
 
     @Transactional
-    public Article saveArticle(Article article) {
-        validateArticleFields(article);
-        validateMemberExists(article.getMemberId());
-        validateBoardExists(article.getBoardId());
+    public Article createArticle(ArticleRequestDto articleDto) {
+        validateMemberExists(articleDto.getMemberId());
+        validateBoardExists(articleDto.getBoardId());
         
+        Article article = new Article();
+        article.setTitle(articleDto.getTitle());
+        article.setContent(articleDto.getContent());
+        article.setMemberId(articleDto.getMemberId());
+        article.setBoardId(articleDto.getBoardId());
+
         LocalDateTime now = LocalDateTime.now();
         
-        if (article.getId() == null) {
-            article.setCreatedAt(now);
-            article.setUpdatedAt(now);
-        } else {
-            Optional<Article> existingArticle = articleDao.findById(article.getId());
-            if (existingArticle.isPresent()) {
-                article.setCreatedAt(existingArticle.get().getCreatedAt());
-                article.setUpdatedAt(now);
-            } else {
-                article.setCreatedAt(now);
-                article.setUpdatedAt(now);
-            }
-        }
+        article.setCreatedAt(now);
+        article.setUpdatedAt(now);
         
         return articleDao.save(article);
     }
     
     @Transactional
-    public Article updateArticle(Long id, Article updatedArticle) {
-        Article existingArticle = findArticleById(id);
+    public Article updateArticle(Long id, ArticleRequestDto articleDto) {
+        Article existingArticle = getArticleByIdOrElseThrow(id);
         
-        validateArticleFields(updatedArticle);
-        validateMemberExists(updatedArticle.getMemberId());
-        validateBoardExists(updatedArticle.getBoardId());
+        validateMemberExists(articleDto.getMemberId());
+        validateBoardExists(articleDto.getBoardId());
         
-        existingArticle.setTitle(updatedArticle.getTitle());
-        existingArticle.setContent(updatedArticle.getContent());
-        existingArticle.setMemberId(updatedArticle.getMemberId());
-        existingArticle.setBoardId(updatedArticle.getBoardId());
+        existingArticle.setTitle(articleDto.getTitle());
+        existingArticle.setContent(articleDto.getContent());
+        existingArticle.setMemberId(articleDto.getMemberId());
+        existingArticle.setBoardId(articleDto.getBoardId());
         existingArticle.setUpdatedAt(LocalDateTime.now());
         
         return articleDao.save(existingArticle);
@@ -91,7 +84,7 @@ public class ArticleService {
 
     @Transactional
     public void deleteArticleById(Long id) {
-        Article article = findArticleById(id);
+        Article article = getArticleByIdOrElseThrow(id);
         articleDao.deleteById(id);
     }
     
@@ -103,13 +96,6 @@ public class ArticleService {
         
         articleDao.deleteById(id);
         return true;
-    }
-
-    private void validateArticleFields(Article article) {
-        if (article.getTitle() == null || article.getContent() == null ||
-            article.getMemberId() == null || article.getBoardId() == null) {
-            throw new InvalidRequestException("게시물 정보의 필수 필드가 누락되었습니다.");
-        }
     }
 
     private void validateMemberExists(Long memberId) {
