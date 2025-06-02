@@ -57,11 +57,6 @@ public class ArticleService {
         article.setContent(articleDto.getContent());
         article.setMemberId(articleDto.getMemberId());
         article.setBoardId(articleDto.getBoardId());
-
-        LocalDateTime now = LocalDateTime.now();
-        
-        article.setCreatedAt(now);
-        article.setUpdatedAt(now);
         
         return articleDao.save(article);
     }
@@ -77,7 +72,6 @@ public class ArticleService {
         existingArticle.setContent(articleDto.getContent());
         existingArticle.setMemberId(articleDto.getMemberId());
         existingArticle.setBoardId(articleDto.getBoardId());
-        existingArticle.setUpdatedAt(LocalDateTime.now());
         
         return articleDao.save(existingArticle);
     }
