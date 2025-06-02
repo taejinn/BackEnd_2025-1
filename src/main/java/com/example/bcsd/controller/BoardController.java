@@ -15,14 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.bcsd.model.Board;
 import com.example.bcsd.service.BoardService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 public class BoardController {
     
     private final BoardService boardService;
-    
-    public BoardController(BoardService boardService) {
-        this.boardService = boardService;
-    }
     
     @GetMapping("/boards")
     public ResponseEntity<List<Board>> getAllBoards() {

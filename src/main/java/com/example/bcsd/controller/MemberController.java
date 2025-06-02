@@ -15,14 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.bcsd.model.Member;
 import com.example.bcsd.service.MemberService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 public class MemberController {
     
     private final MemberService memberService;
-    
-    public MemberController(MemberService memberService) {
-        this.memberService = memberService;
-    }
     
     @GetMapping("/members")
     public ResponseEntity<List<Member>> getAllMembers() {
