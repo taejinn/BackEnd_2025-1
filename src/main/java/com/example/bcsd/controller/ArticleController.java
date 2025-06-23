@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.bcsd.dto.ArticleRequestDto;
+import com.example.bcsd.dto.ArticleResponseDto;
 import com.example.bcsd.dto.ArticleSearchRequestDto;
-import com.example.bcsd.model.Article;
 import com.example.bcsd.service.ArticleService;
 
 import jakarta.validation.Valid;
@@ -31,7 +31,7 @@ public class ArticleController {
     
     @GetMapping("/posts")
     public String posts(Model model, @Valid @ModelAttribute ArticleSearchRequestDto searchDto) {
-        List<Article> articles;
+        List<ArticleResponseDto> articles;
         if (searchDto.getBoardId() != null) {
             articles = articleService.getArticlesByBoardId(searchDto.getBoardId());
             model.addAttribute("boardId", searchDto.getBoardId());
@@ -44,8 +44,8 @@ public class ArticleController {
 
     @GetMapping("/articles")
     @ResponseBody
-    public ResponseEntity<List<Article>> getArticles(@Valid @ModelAttribute ArticleSearchRequestDto searchDto) {
-        List<Article> articles;
+    public ResponseEntity<List<ArticleResponseDto>> getArticles(@Valid @ModelAttribute ArticleSearchRequestDto searchDto) {
+        List<ArticleResponseDto> articles;
         if (searchDto.getBoardId() != null) {
             articles = articleService.getArticlesByBoardId(searchDto.getBoardId());
         } else {
@@ -56,22 +56,22 @@ public class ArticleController {
 
     @GetMapping("/article/{id}")
     @ResponseBody
-    public ResponseEntity<Article> getArticle(@PathVariable("id") Long id) {
-        Article article = articleService.getArticleByIdOrElseThrow(id);
+    public ResponseEntity<ArticleResponseDto> getArticle(@PathVariable("id") Long id) {
+        ArticleResponseDto article = articleService.getArticleByIdOrElseThrow(id);
         return ResponseEntity.ok(article);
     }
 
     @PostMapping("/article")
     @ResponseBody
-    public ResponseEntity<Article> createArticle(@Valid @RequestBody ArticleRequestDto articleDto) {
-        Article savedArticle = articleService.createArticle(articleDto);
+    public ResponseEntity<ArticleResponseDto> createArticle(@Valid @RequestBody ArticleRequestDto articleDto) {
+        ArticleResponseDto savedArticle = articleService.createArticle(articleDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedArticle);
     }
 
     @PutMapping("/article/{id}")
     @ResponseBody
-    public ResponseEntity<Article> updateArticle(@PathVariable("id") Long id, @Valid @RequestBody ArticleRequestDto articleDto) {
-        Article updatedArticle = articleService.updateArticle(id, articleDto);
+    public ResponseEntity<ArticleResponseDto> updateArticle(@PathVariable("id") Long id, @Valid @RequestBody ArticleRequestDto articleDto) {
+        ArticleResponseDto updatedArticle = articleService.updateArticle(id, articleDto);
         return ResponseEntity.ok(updatedArticle);
     }
 
