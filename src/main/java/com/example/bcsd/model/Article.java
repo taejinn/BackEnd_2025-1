@@ -2,9 +2,12 @@ package com.example.bcsd.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -18,8 +21,9 @@ public class Article {
     @Column(name = "author_id")
     private Long memberId;
 
-    @Column(name = "board_id")
-    private Long boardId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "board_id")
+    private Board board;
 
     private String title;
     private String content;
@@ -35,11 +39,11 @@ public class Article {
     public Article() {
     }
 
-    public Article(Long id, Long memberId, Long boardId, String title, String content,
+    public Article(Long id, Long memberId, Board board, String title, String content,
                   LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.memberId = memberId;
-        this.boardId = boardId;
+        this.board = board;
         this.title = title;
         this.content = content;
         this.createdAt = createdAt;
@@ -62,12 +66,12 @@ public class Article {
         this.memberId = memberId;
     }
 
-    public Long getBoardId() {
-        return boardId;
+    public Board getBoard() {
+        return board;
     }
 
-    public void setBoardId(Long boardId) {
-        this.boardId = boardId;
+    public void setBoard(Board board) {
+        this.board = board;
     }
 
     public String getTitle() {
