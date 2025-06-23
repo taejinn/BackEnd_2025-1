@@ -6,8 +6,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.bcsd.dao.ArticleDao;
-import com.example.bcsd.dao.MemberDao;
+import com.example.bcsd.repository.ArticleRepository;
+import com.example.bcsd.repository.MemberRepository;
 import com.example.bcsd.dto.MemberRequestDto;
 import com.example.bcsd.exception.DuplicateResourceException;
 import com.example.bcsd.exception.InvalidRequestException;
@@ -17,25 +17,25 @@ import com.example.bcsd.model.Member;
 
 @Service
 public class MemberService {
-    private final MemberDao memberDao;
-    private final ArticleDao articleDao;
+    private final MemberRepository memberRepository;
+    private final ArticleRepository articleRepository;
 
-    public MemberService(MemberDao memberDao, ArticleDao articleDao) {
-        this.memberDao = memberDao;
-        this.articleDao = articleDao;
+    public MemberService(MemberRepository memberRepository, ArticleRepository articleRepository) {
+        this.memberRepository = memberRepository;
+        this.articleRepository = articleRepository;
     }
 
     public List<Member> getAllMembers() {
-        return memberDao.findAll();
+        return memberRepository.findAll();
     }
 
     public Member getMemberById(Long id) {
-        return memberDao.findById(id)
+        return memberRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 사용자입니다."));
     }
 
     public Optional<Member> getMemberByEmail(String email) {
-        return memberDao.findByEmail(email);
+        return memberRepository.findByEmail(email);
     }
 
     @Transactional
@@ -45,11 +45,11 @@ public class MemberService {
         member.setEmail(memberDto.getEmail());
         member.setPassword(memberDto.getPassword());
 
-        Optional<Member> existingMember = memberDao.findByEmail(member.getEmail());
+        Optional<Member> existingMember = memberRepository.findByEmail(member.getEmail());
         if (existingMember.isPresent() && (member.getId() == null || !existingMember.get().getId().equals(member.getId()))) {
             throw new DuplicateResourceException("이미 사용 중인 이메일입니다.");
         }
-        return memberDao.save(member);
+        return memberRepository.save(member);
     }
 
     @Transactional
@@ -57,7 +57,7 @@ public class MemberService {
         Member existingMemberEntity = getMemberById(id);
         
         if (!existingMemberEntity.getEmail().equals(memberDto.getEmail())) {
-            Optional<Member> duplicateEmailMember = memberDao.findByEmail(memberDto.getEmail());
+            Optional<Member> duplicateEmailMember = memberRepository.findByEmail(memberDto.getEmail());
             if (duplicateEmailMember.isPresent()) {
                 throw new DuplicateResourceException("이미 사용 중인 이메일입니다.");
             }
@@ -67,18 +67,18 @@ public class MemberService {
         existingMemberEntity.setEmail(memberDto.getEmail());
         existingMemberEntity.setPassword(memberDto.getPassword());
         
-        return memberDao.save(existingMemberEntity);
+        return memberRepository.save(existingMemberEntity);
     }
 
     @Transactional
     public void deleteMemberById(Long id) {
         Member member = getMemberById(id);
         
-        List<Article> memberArticles = articleDao.findByMemberId(id);
+        List<Article> memberArticles = articleRepository.findByMemberId(id);
         if (!memberArticles.isEmpty()) {
             throw new InvalidRequestException("사용자가 작성한 게시물이 존재하여 삭제할 수 없습니다.");
         }
         
-        memberDao.deleteById(id);
+        memberRepository.deleteById(id);
     }
 } 
