@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,10 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.bcsd.dto.ArticleRequestDto;
+import com.example.bcsd.dto.ArticleSearchRequestDto;
 import com.example.bcsd.model.Article;
 import com.example.bcsd.service.ArticleService;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -29,12 +30,11 @@ public class ArticleController {
     private final ArticleService articleService;
     
     @GetMapping("/posts")
-    public String posts(Model model, HttpServletRequest request) {
-        String boardId = request.getParameter("boardId");
+    public String posts(Model model, @Valid @ModelAttribute ArticleSearchRequestDto searchDto) {
         List<Article> articles;
-        if (boardId != null && !boardId.isEmpty()) {
-            articles = articleService.getArticlesByBoardId(Long.valueOf(boardId));
-            model.addAttribute("boardId", boardId);
+        if (searchDto.getBoardId() != null) {
+            articles = articleService.getArticlesByBoardId(searchDto.getBoardId());
+            model.addAttribute("boardId", searchDto.getBoardId());
         } else {
             articles = articleService.getAllArticles();
         }
@@ -44,11 +44,10 @@ public class ArticleController {
 
     @GetMapping("/articles")
     @ResponseBody
-    public ResponseEntity<List<Article>> getArticles(HttpServletRequest request) {
-        String boardId = request.getParameter("boardId");
+    public ResponseEntity<List<Article>> getArticles(@Valid @ModelAttribute ArticleSearchRequestDto searchDto) {
         List<Article> articles;
-        if (boardId != null && !boardId.isEmpty()) {
-            articles = articleService.getArticlesByBoardId(Long.valueOf(boardId));
+        if (searchDto.getBoardId() != null) {
+            articles = articleService.getArticlesByBoardId(searchDto.getBoardId());
         } else {
             articles = articleService.getAllArticles();
         }
