@@ -35,20 +35,12 @@ public class BoardService {
 
     @Transactional
     public Board createBoard(BoardRequestDto boardDto) {
-        Board board = new Board();
-        board.setName(boardDto.getName());
-
-        Optional<Board> existingBoard = boardRepository.findByName(board.getName());
-        
-        if (existingBoard.isPresent()) {
-            boolean isNewBoard = (board.getId() == null);
-            boolean isDifferentBoard = !existingBoard.get().getId().equals(board.getId());
-            
-            if (isNewBoard || isDifferentBoard) {
-                throw new DuplicateResourceException("이미 사용 중인 게시판 이름입니다.");
-            }
+        if (boardRepository.existsByName(boardDto.getName())) {
+            throw new DuplicateResourceException("이미 사용 중인 게시판 이름입니다.");
         }
         
+        Board board = new Board();
+        board.setName(boardDto.getName());
         return boardRepository.save(board);
     }
 
@@ -60,8 +52,7 @@ public class BoardService {
             return boardRepository.save(existingBoardEntity);
         }
         
-        Optional<Board> duplicateNameBoard = boardRepository.findByName(boardDto.getName());
-        if (duplicateNameBoard.isPresent()) {
+        if (boardRepository.existsByName(boardDto.getName())) {
             throw new DuplicateResourceException("이미 사용 중인 게시판 이름입니다.");
         }
         
@@ -71,7 +62,9 @@ public class BoardService {
 
     @Transactional
     public void deleteBoardById(Long id) {
-        Board board = getBoardById(id);
+        if (!boardRepository.existsById(id)) {
+            throw new ResourceNotFoundException("존재하지 않는 게시판입니다.");
+        }
         boardRepository.deleteById(id);
     }
 } 
