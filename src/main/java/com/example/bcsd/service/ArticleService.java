@@ -1,21 +1,20 @@
 package com.example.bcsd.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.bcsd.repository.ArticleRepository;
-import com.example.bcsd.repository.BoardRepository;
-import com.example.bcsd.repository.MemberRepository;
 import com.example.bcsd.dto.ArticleRequestDto;
 import com.example.bcsd.dto.ArticleResponseDto;
 import com.example.bcsd.exception.InvalidRequestException;
 import com.example.bcsd.exception.ResourceNotFoundException;
 import com.example.bcsd.model.Article;
 import com.example.bcsd.model.Board;
+import com.example.bcsd.repository.ArticleRepository;
+import com.example.bcsd.repository.BoardRepository;
+import com.example.bcsd.repository.MemberRepository;
 
 @Service
 public class ArticleService {
@@ -31,14 +30,14 @@ public class ArticleService {
 
     public List<ArticleResponseDto> getAllArticles() {
         return articleRepository.findAll().stream()
-                .map(this::convertToResponseDto)
+                .map(ArticleResponseDto::from)
                 .collect(Collectors.toList());
     }
 
     public ArticleResponseDto getArticleByIdOrElseThrow(Long id) {
         Article article = articleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 게시물입니다."));
-        return convertToResponseDto(article);
+        return ArticleResponseDto.from(article);
     }
     
     public Article getArticleById(Long id) {
@@ -47,13 +46,13 @@ public class ArticleService {
 
     public List<ArticleResponseDto> getArticlesByMemberId(Long memberId) {
         return articleRepository.findByMemberId(memberId).stream()
-                .map(this::convertToResponseDto)
+                .map(ArticleResponseDto::from)
                 .collect(Collectors.toList());
     }
 
     public List<ArticleResponseDto> getArticlesByBoardId(Long boardId) {
         return articleRepository.findByBoardId(boardId).stream()
-                .map(this::convertToResponseDto)
+                .map(ArticleResponseDto::from)
                 .collect(Collectors.toList());
     }
 
@@ -69,7 +68,7 @@ public class ArticleService {
         article.setBoard(board);
         
         Article savedArticle = articleRepository.save(article);
-        return convertToResponseDto(savedArticle);
+        return ArticleResponseDto.from(savedArticle);
     }
     
     @Transactional
@@ -86,7 +85,7 @@ public class ArticleService {
         existingArticle.setBoard(board);
         
         Article updatedArticle = articleRepository.save(existingArticle);
-        return convertToResponseDto(updatedArticle);
+        return ArticleResponseDto.from(updatedArticle);
     }
 
     @Transactional
@@ -115,18 +114,5 @@ public class ArticleService {
     private Board validateBoardExists(Long boardId) {
         return boardRepository.findById(boardId)
                 .orElseThrow(() -> new InvalidRequestException("존재하지 않는 게시판을 참조할 수 없습니다."));
-    }
-
-    private ArticleResponseDto convertToResponseDto(Article article) {
-        return new ArticleResponseDto(
-                article.getId(),
-                article.getMemberId(),
-                article.getBoard() != null ? article.getBoard().getId() : null,
-                article.getBoard() != null ? article.getBoard().getName() : null,
-                article.getTitle(),
-                article.getContent(),
-                article.getCreatedAt(),
-                article.getUpdatedAt()
-        );
     }
 } 

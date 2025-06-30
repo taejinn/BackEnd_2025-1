@@ -1,6 +1,8 @@
 package com.example.bcsd.dto;
 
 import java.time.LocalDateTime;
+import com.example.bcsd.model.Article;
+import com.example.bcsd.model.Board;
 
 public class ArticleResponseDto {
     
@@ -26,6 +28,20 @@ public class ArticleResponseDto {
         this.content = content;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public static ArticleResponseDto from(Article article) {
+        Board board = article.getBoard();
+        return new ArticleResponseDto(
+                article.getId(),
+                article.getMemberId(),
+                board != null ? board.getId() : null,
+                board != null ? board.getName() : null,
+                article.getTitle(),
+                article.getContent(),
+                article.getCreatedAt(),
+                article.getUpdatedAt()
+        );
     }
 
     public Long getId() {
