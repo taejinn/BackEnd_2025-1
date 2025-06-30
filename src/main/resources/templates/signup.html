@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+</head>
+<body>
+    <h1>회원가입</h1>
+    
+    <form th:action="@{/signup}" th:object="${memberRequestDto}" method="post">
+        <table>
+            <tr>
+                <td><label for="name">이름:</label></td>
+                <td>
+                    <input type="text" th:field="*{name}" required>
+                    <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="email">이메일:</label></td>
+                <td>
+                    <input type="email" th:field="*{email}" required>
+                    <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="password">비밀번호:</label></td>
+                <td>
+                    <input type="password" th:field="*{password}" required>
+                    <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="confirmPassword">비밀번호 확인:</label></td>
+                <td>
+                    <input type="password" th:field="*{confirmPassword}" required>
+                    <div th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="submit" value="회원가입">
+                </td>
+            </tr>
+        </table>
+    </form>
+    
+    <br>
+    <a href="/login">로그인</a>
+    
+    <div th:if="${error}">
+        <p th:text="${error}"></p>
+    </div>
+    
+    <div th:if="${success}">
+        <p th:text="${success}"></p>
+    </div>
+</body>
+</html> 

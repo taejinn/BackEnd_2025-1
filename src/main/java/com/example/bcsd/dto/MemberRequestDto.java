@@ -3,7 +3,17 @@ package com.example.bcsd.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString(exclude = {"password", "confirmPassword"})
 public class MemberRequestDto {
 
     @NotEmpty(message = "이름은 필수 입력 항목입니다.")
@@ -14,29 +24,9 @@ public class MemberRequestDto {
     private String email;
 
     @NotEmpty(message = "비밀번호는 필수 입력 항목입니다.")
+    @Size(min = 6, max = 20, message = "비밀번호는 6자 이상 20자 이하로 입력해주세요.")
     private String password;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    @NotEmpty(message = "비밀번호 확인은 필수 입력 항목입니다.")
+    private String confirmPassword;
 } 
