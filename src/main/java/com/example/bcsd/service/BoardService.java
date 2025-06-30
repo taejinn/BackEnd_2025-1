@@ -6,11 +6,11 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.bcsd.repository.BoardRepository;
 import com.example.bcsd.dto.BoardRequestDto;
 import com.example.bcsd.exception.DuplicateResourceException;
 import com.example.bcsd.exception.ResourceNotFoundException;
 import com.example.bcsd.model.Board;
+import com.example.bcsd.repository.BoardRepository;
 
 @Service
 public class BoardService {
@@ -39,9 +39,16 @@ public class BoardService {
         board.setName(boardDto.getName());
 
         Optional<Board> existingBoard = boardRepository.findByName(board.getName());
-        if (existingBoard.isPresent() && (board.getId() == null || !existingBoard.get().getId().equals(board.getId()))) {
-            throw new DuplicateResourceException("이미 사용 중인 게시판 이름입니다.");
+        
+        if (existingBoard.isPresent()) {
+            boolean isNewBoard = (board.getId() == null);
+            boolean isDifferentBoard = !existingBoard.get().getId().equals(board.getId());
+            
+            if (isNewBoard || isDifferentBoard) {
+                throw new DuplicateResourceException("이미 사용 중인 게시판 이름입니다.");
+            }
         }
+        
         return boardRepository.save(board);
     }
 
@@ -49,15 +56,16 @@ public class BoardService {
     public Board updateBoard(Long id, BoardRequestDto boardDto) {
         Board existingBoardEntity = getBoardById(id);
         
-        if (!existingBoardEntity.getName().equals(boardDto.getName())) {
-            Optional<Board> duplicateNameBoard = boardRepository.findByName(boardDto.getName());
-            if (duplicateNameBoard.isPresent()) {
-                throw new DuplicateResourceException("이미 사용 중인 게시판 이름입니다.");
-            }
+        if (existingBoardEntity.getName().equals(boardDto.getName())) {
+            return boardRepository.save(existingBoardEntity);
+        }
+        
+        Optional<Board> duplicateNameBoard = boardRepository.findByName(boardDto.getName());
+        if (duplicateNameBoard.isPresent()) {
+            throw new DuplicateResourceException("이미 사용 중인 게시판 이름입니다.");
         }
         
         existingBoardEntity.setName(boardDto.getName());
-        
         return boardRepository.save(existingBoardEntity);
     }
 
