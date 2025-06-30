@@ -1,18 +1,46 @@
 package com.example.bcsd.dto;
 
 import java.time.LocalDateTime;
+
 import com.example.bcsd.model.Article;
 import com.example.bcsd.model.Board;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Size;
+
 public class ArticleResponseDto {
     
+    @NotNull
+    @Min(1)
     private Long id;
+    
+    @NotNull
+    @Min(1)
     private Long memberId;
+    
+    @Min(1)
     private Long boardId;
+    
+    @Size(max = 100)
     private String boardName;
+    
+    @NotBlank
+    @Size(min = 1, max = 200)
     private String title;
+    
+    @NotBlank
+    @Size(min = 1, max = 5000)
     private String content;
+    
+    @NotNull
+    @PastOrPresent
     private LocalDateTime createdAt;
+    
+    @NotNull
+    @PastOrPresent
     private LocalDateTime updatedAt;
 
     public ArticleResponseDto() {
