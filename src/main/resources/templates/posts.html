@@ -15,10 +15,10 @@
     </style>
 </head>
 <body>
-<th:block th:if="${boardId == null || boardId.isEmpty()}">
+<th:block th:if="${boardId == null}">
     <div class="title">전체글보기</div>
 </th:block>
-<th:block th:if="${boardId != null && !boardId.isEmpty()}">
+<th:block th:if="${boardId != null}">
     <div class="title">게시판: <span th:text="${boardId}">boardId</span></div>
 </th:block>
 <table border="1">
